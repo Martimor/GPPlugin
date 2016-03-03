@@ -67,10 +67,14 @@ public class MyListener implements Listener {
             Sign s = (Sign) event.getClickedBlock().getState();
             
             if(s.getLine(0).equalsIgnoreCase("Test")){
+            
+
+            p.sendMessage(s.getLine(0));
             	
+            /*
             ItemStack bricks = new ItemStack(Material.BRICK);
             bricks.setAmount(20);
-            p.getInventory().addItem(bricks);
+            p.getInventory().addItem(bricks);*/
             }
         }
         
