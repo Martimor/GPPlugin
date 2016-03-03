@@ -1,9 +1,9 @@
 package com.gp.suite;
 
+import java.io.File;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mysql.jdbc.Connection;
@@ -21,7 +21,8 @@ public class WebInterface extends JavaPlugin {
     @Override
     public void onEnable() {
     	 //getConfig().addDefault("youAreAwesome", true);
-    	
+
+    	createConfig();
     	
     	try { //We use a try catch to avoid errors, hopefully we don't get any.
             Class.forName("com.mysql.jdbc.Driver"); //this accesses Driver in jdbc.
@@ -46,6 +47,8 @@ public class WebInterface extends JavaPlugin {
     // Fired when plugin is disabled
     @Override
     public void onDisable() {
+    	
+    	
         // envoke on disable.
         try { //using a try catch to catch connection errors (like wrong sql password...)
                 if(connection!=null && !connection.isClosed()){ //checking if connection isn't null to
@@ -56,5 +59,25 @@ public class WebInterface extends JavaPlugin {
                         e.printStackTrace();
             
                 }
+        
+    }
+    
+    private void createConfig() {
+        try {
+            if (!getDataFolder().exists()) {
+                getDataFolder().mkdirs();
+            }
+            File file = new File(getDataFolder(), "config.yml");
+            if (!file.exists()) {
+                getLogger().info("Config.yml not found, creating!");
+                saveDefaultConfig();
+            } else {
+                getLogger().info("Config.yml found, loading!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
     }
 }
