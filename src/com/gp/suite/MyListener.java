@@ -75,6 +75,10 @@ public class MyListener implements Listener {
             ItemStack bricks = new ItemStack(Material.BRICK);
             bricks.setAmount(20);
             p.getInventory().addItem(bricks);*/
+            	
+            ItemStack bricks = new ItemStack(Material.BRICK);
+            bricks.setAmount(20);
+            p.getInventory().addItem(bricks);
             }
         }
         
