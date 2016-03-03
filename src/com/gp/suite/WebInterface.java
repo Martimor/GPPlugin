@@ -1,10 +1,12 @@
 package com.gp.suite;
-import java.sql.Connection;
+
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.mysql.jdbc.Connection;
 public class WebInterface extends JavaPlugin {
 	
 	//DataBase vars.
@@ -29,7 +31,7 @@ public class WebInterface extends JavaPlugin {
             return;
         }
         try { //Another try catch to get any SQL errors (for example connections errors)
-            connection = DriverManager.getConnection(url,username,password);
+            connection = (Connection) DriverManager.getConnection(url,username,password);
             //with the method getConnection() from DriverManager, we're trying to set
             //the connection's url, username, password to the variables we made earlier and
             //trying to get a connection at the same time. JDBC allows us to do this.
