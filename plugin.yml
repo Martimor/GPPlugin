@@ -1,0 +1,7 @@
+name: WebInterface
+main: com.gp.suite.WebInterface
+version: 1.0
+commands:
+  test:
+    description: Your description
+    usage: /test
