@@ -38,7 +38,7 @@ public class ActionListener implements Listener {
 	            Sign s = (Sign) event.getClickedBlock().getState();
 	            
 	            if(s.getLine(0).equalsIgnoreCase("GP Real Estate")){
-	            	buyEstate(event.getClickedBlock().getLocation(), event.getPlayer());
+	            	buyEstate(event.getClickedBlock().getLocation(), event.getPlayer(), s);
 	            }
 	        } else
 	        if(event.getClickedBlock().getType() == Material.GRASS && p.getItemInHand().getType() == Material.STICK && p.isOp() == true)
@@ -50,15 +50,18 @@ public class ActionListener implements Listener {
         }
     }
 
-	private boolean buyEstate(Location location, Player player) {
+	private boolean buyEstate(Location location, Player player, Sign s) {
     	Statement statement;
 		try {
 			statement = GP2PPLugin.connection.createStatement();
-			ResultSet rs = statement.executeQuery("SELECT id FROM gp_mc_user WHERE `uuid` = '"+player.getUniqueId()+"'");
+			ResultSet rs = statement.executeQuery("SELECT id, username FROM gp_mc_user WHERE `uuid` = '"+player.getUniqueId()+"'");
 			if (rs.next())
 			{
-			int playerid = rs.getInt("id");
-			int en = statement.executeUpdate("UPDATE gp_mc_estate SET `playerid` = '"+ playerid +"' WHERE `x1` <= '"+location.getX()+"' AND `x2` >= '"+location.getX()+"' AND `z1` <= '"+location.getZ()+"' AND `z2` >= '"+location.getZ()+"'");
+			int playerid = rs.getInt("id");			
+			s.setLine(2, rs.getString("username"));
+			s.update();
+			
+			int en = statement.executeUpdate("UPDATE gp_mc_estate SET `playerid` = '"+ playerid +"' WHERE `x1` <= '"+location.getX()+"' AND `x2` >= '"+location.getX()+"' AND `z1` <= '"+(location.getZ() + 1) +"' AND `z2` >= '"+location.getZ()+"'");
 			if (en > 0) return true; else return false;
 			} else return false;
 		} catch (SQLException e) {

@@ -17,11 +17,8 @@ public class LogListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event)
     {
-    	event.setJoinMessage("Welcome, " + event.getPlayer().getName() + "!");
-    }
-    
-    @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
+    	event.setJoinMessage("Welcome, " + event.getPlayer().getName() + "!");    	
+    	
     	Statement statement;
 		try {
 			statement = GP2PPLugin.connection.createStatement();
@@ -31,11 +28,16 @@ public class LogListener implements Listener {
 			if (rs.next()) 
 		    statement.executeUpdate("UPDATE gp_mc_user SET `letzterlogin` = '"+(new Timestamp(date.getTime()))+"', `aktiv` = true WHERE `id` = " + rs.getInt("id"));
 			else
-	    	statement.executeUpdate("INSERT INTO gp_mc_user (`username`, `uuid`, `aktiv`) VALUES ('"+event.getPlayer().getName()+"','"+event.getPlayer().getUniqueId()+"', 'true')");
+	    	statement.executeUpdate("INSERT INTO gp_mc_user (`username`, `uuid`, `aktiv`) VALUES ('"+event.getPlayer().getName()+"','"+event.getPlayer().getUniqueId()+"', true)");
 		
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    @EventHandler
+    public void onLogin(PlayerLoginEvent event) {
+
     }
     
     @EventHandler
