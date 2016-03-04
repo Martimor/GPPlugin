@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 
 public class InfoCommand implements CommandExecutor {
 
-    // This method is called, when somebody uses our command
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String lable, String[] args) {
         if (sender instanceof Player) {

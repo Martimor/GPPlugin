@@ -4,9 +4,11 @@ import java.io.File;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mysql.jdbc.Connection;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 public class GP2PPLugin extends JavaPlugin {
 	
     final String username= getConfig().getString("Username");
@@ -44,6 +46,17 @@ public class GP2PPLugin extends JavaPlugin {
         }catch(Exception e){
                 e.printStackTrace();
         }
+    }
+    
+    public WorldGuardPlugin getWorldGuard() {
+        Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
+     
+        // WorldGuard may not be loaded
+        if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+            return null; // Maybe you want throw an exception instead
+        }
+     
+        return (WorldGuardPlugin) plugin;
     }
     
     private void createConfig() {
