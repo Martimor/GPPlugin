@@ -117,8 +117,8 @@ public class ActionListener implements Listener {
 	    	RegionManager regions = container.get(world);
 	    	int numregions = regions.getRegions().size();
 
-			new Location(world, x1, block.getY(), z1 - 1).getBlock().setType(Material.SIGN_POST);
-			Sign s = (Sign) new Location(world, x1, block.getY(), z1 - 1).getBlock().getState();
+			new Location(world, x1, block.getY() + 1, z1 - 1).getBlock().setType(Material.SIGN_POST);
+			Sign s = (Sign) new Location(world, x1, block.getY() + 1, z1 - 1).getBlock().getState();
 			((org.bukkit.material.Sign)s.getData()).setFacingDirection(BlockFace.NORTH);
 			s.setLine(0, "GP Real Estate");
 			s.setLine(1, "GS" + numregions);
