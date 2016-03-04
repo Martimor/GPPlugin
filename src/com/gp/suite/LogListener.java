@@ -6,20 +6,14 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import org.bukkit.Material;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 
 
-public class MyListener implements Listener {
+public class LogListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event)
     {
@@ -30,7 +24,7 @@ public class MyListener implements Listener {
     public void onLogin(PlayerLoginEvent event) {
     	Statement statement;
 		try {
-			statement = WebInterface.connection.createStatement();
+			statement = GP2PPLugin.connection.createStatement();
 
 	   	 	Date date= new java.util.Date();
 			ResultSet rs = statement.executeQuery("SELECT id FROM gp_mc_user WHERE `uuid` = '"+event.getPlayer().getUniqueId()+"'");
@@ -48,7 +42,7 @@ public class MyListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
     	Statement statement;
 		try {
-			statement = WebInterface.connection.createStatement();
+			statement = GP2PPLugin.connection.createStatement();
 			
 	   	 	Date date= new java.util.Date();
 		    statement.executeUpdate("UPDATE gp_mc_user SET `letzterlogout` = '"+(new Timestamp(date.getTime()))+"', `aktiv` = false WHERE `uuid` = '"+event.getPlayer().getUniqueId()+"'");
@@ -56,38 +50,5 @@ public class MyListener implements Listener {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-    }
-  
-    
-    @EventHandler(priority=EventPriority.HIGH)
-    public void onPlayerUse(PlayerInteractEvent event){
-        Player p = event.getPlayer();
-        if(event.getClickedBlock().getType() == Material.SIGN_POST)
-        {    
-            Sign s = (Sign) event.getClickedBlock().getState();
-            
-            if(s.getLine(0).equalsIgnoreCase("Test")){
-            
-
-            p.sendMessage(s.getLine(0));
-            	
-            /*
-            ItemStack bricks = new ItemStack(Material.BRICK);
-            bricks.setAmount(20);
-            p.getInventory().addItem(bricks);*/
-            	
-            ItemStack bricks = new ItemStack(Material.BRICK);
-            bricks.setAmount(20);
-            p.getInventory().addItem(bricks);
-            }
-        }
-        
-        /*
-        if(p.getItemInHand() == Material.BLAZE_POWDER){
-
-        }
-        else if(p.getItemInHand() == Material.BLAZE_ROD){
-            //Do whatever
-        }*/
     }
 }

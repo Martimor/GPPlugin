@@ -1,7 +1,7 @@
-name: WebInterface
-main: com.gp.suite.WebInterface
+name: GP2PPLugin
+main: com.gp.suite.GP2PPLugin
 version: 1.0
 commands:
-  test:
-    description: Your description
-    usage: /test
+  info:
+    description: Zeigt Informationen zum Plugin an
+    usage: /info
