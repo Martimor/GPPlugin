@@ -16,6 +16,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import com.iCo6.iConomy;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.RegionContainer;
 import com.sk89q.worldguard.bukkit.WGBukkit;
@@ -43,6 +44,7 @@ public class ActionListener implements Listener {
 	        } else
 	        if(event.getClickedBlock().getType() == Material.GRASS && p.getItemInHand().getType() == Material.STICK && p.isOp() == true)
 	        {    
+	        	
 	        	if(!checkIsEstate(event.getClickedBlock().getLocation())) 
 	        	if(setNewEstate(event.getClickedBlock())) 
 	                p.sendMessage("Grundstück angelegt");
@@ -82,25 +84,25 @@ public class ActionListener implements Listener {
 			int z1 = 1;
 			int z2 = 1;
 			
-			while(new Location(world, block.getX() - x1, block.getY(), block.getZ()).getBlock().getType() == Material.GRASS)
+			while(new Location(world, block.getX() - x1, block.getY(), block.getZ()).getBlock().getType() != Material.WOOD)
 			{
 				x1++;
 				if(x1 > 500) { x1 = -1; break; }
 			}
 			
-			while(new Location(world, block.getX() + x2, block.getY(), block.getZ()).getBlock().getType() == Material.GRASS)
+			while(new Location(world, block.getX() + x2, block.getY(), block.getZ()).getBlock().getType() != Material.WOOD)
 			{
 				x2++;
 				if(x2 > 500) { x2 = -1; break; }
 			}
 			
-			while(new Location(world, block.getX(), block.getY(), block.getZ() - z1).getBlock().getType() == Material.GRASS)
+			while(new Location(world, block.getX(), block.getY(), block.getZ() - z1).getBlock().getType() != Material.WOOD)
 			{
 				z1++;
 				if(z1 > 500) { z1 = -1; break; }
 			}
 			
-			while(new Location(world, block.getX(), block.getY(), block.getZ() + z2).getBlock().getType() == Material.GRASS)
+			while(new Location(world, block.getX(), block.getY(), block.getZ() + z2).getBlock().getType() != Material.WOOD)
 			{
 				z2++;
 				if(z2 > 500) { z2 = -1; break; }
