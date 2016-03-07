@@ -3,7 +3,6 @@ package com.gp.suite;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,7 +16,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import com.iCo6.iConomy;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.RegionContainer;
 import com.sk89q.worldguard.bukkit.WGBukkit;
@@ -62,23 +60,26 @@ public class ActionListener implements Listener {
 			ResultSet rs = statement.executeQuery("SELECT id, username FROM gp_mc_user WHERE `uuid` = '"+player.getUniqueId()+"'");
 			if (rs.next())
 			{
-			int playerid = rs.getInt("id");			
-			s.setLine(2, rs.getString("username"));
-			s.update();
+			int playerid = rs.getInt("id");		
+			String playername = rs.getString("username");
 			
 			World world = player.getWorld();
 	    	WorldGuardPlugin wg = WGBukkit.getPlugin();
 	    	
 	    	RegionContainer container = wg.getRegionContainer();
 	    	RegionManager regions = container.get(world);
-	    	ApplicableRegionSet set = regions.getApplicableRegions(location);
-	    	
+	    	ApplicableRegionSet set = regions.getApplicableRegions(new Location(world, location.getX(), location.getY(), location.getZ() + 1));
 	    	
 	    	for (ProtectedRegion region : set) 
+	    	{	    	
 	    	    if (region.getId() != "__global__") 
 	    	    {
     	    	DefaultDomain members = region.getMembers();
-    	    	members.addPlayer(player.getName());
+    	    	members.addPlayer(player.getUniqueId());
+    	    	player.sendMessage(region.getId() + " erfolgreich gekauft.");
+    	    	
+    			s.setLine(2, playername);
+    			s.update();
 	    	try {
 				regions.saveChanges();
 				regions.save();
@@ -91,6 +92,7 @@ public class ActionListener implements Listener {
 			
 			if (en > 0) return true; else return false;
 	    	    } else return false;
+			}
 			return false;
 			} else return false;
 		} catch (SQLException e) {
