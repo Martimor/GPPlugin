@@ -3,6 +3,7 @@ package com.gp.suite;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,6 +22,8 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.RegionContainer;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -63,8 +66,32 @@ public class ActionListener implements Listener {
 			s.setLine(2, rs.getString("username"));
 			s.update();
 			
-			int en = statement.executeUpdate("UPDATE gp_mc_estate SET `playerid` = '"+ playerid +"' WHERE `x1` <= '"+location.getX()+"' AND `x2` >= '"+location.getX()+"' AND `z1` <= '"+(location.getZ() + 1) +"' AND `z2` >= '"+location.getZ()+"'");
+			World world = player.getWorld();
+	    	WorldGuardPlugin wg = WGBukkit.getPlugin();
+	    	
+	    	RegionContainer container = wg.getRegionContainer();
+	    	RegionManager regions = container.get(world);
+	    	ApplicableRegionSet set = regions.getApplicableRegions(location);
+	    	
+	    	
+	    	for (ProtectedRegion region : set) 
+	    	    if (region.getId() != "__global__") 
+	    	    {
+    	    	DefaultDomain members = region.getMembers();
+    	    	members.addPlayer(player.getName());
+	    	try {
+				regions.saveChanges();
+				regions.save();
+			} catch (StorageException e) {
+				e.printStackTrace();
+				return false;
+			}
+
+			int en = statement.executeUpdate("UPDATE gp_mc_estate SET `playerid` = '"+ playerid +"' WHERE `name` = '"+region.getId()+"'");
+			
 			if (en > 0) return true; else return false;
+	    	    } else return false;
+			return false;
 			} else return false;
 		} catch (SQLException e) {
 			e.printStackTrace();
