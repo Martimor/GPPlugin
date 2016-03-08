@@ -4,8 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -62,8 +64,9 @@ public class ActionListener implements Listener {
 			{
 			int playerid = rs.getInt("id");		
 			String playername = rs.getString("username");
-			
+			OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 			World world = player.getWorld();
+			
 	    	WorldGuardPlugin wg = WGBukkit.getPlugin();
 	    	
 	    	RegionContainer container = wg.getRegionContainer();
@@ -71,27 +74,43 @@ public class ActionListener implements Listener {
 	    	ApplicableRegionSet set = regions.getApplicableRegions(new Location(world, location.getX(), location.getY(), location.getZ() + 1));
 	    	
 	    	for (ProtectedRegion region : set) 
-	    	{	    	
-	    	    if (region.getId() != "__global__") 
-	    	    {
-    	    	DefaultDomain members = region.getMembers();
-    	    	members.addPlayer(player.getUniqueId());
-    	    	player.sendMessage(region.getId() + " erfolgreich gekauft.");
-    	    	
-    			s.setLine(2, playername);
-    			s.update();
-	    	try {
-				regions.saveChanges();
-				regions.save();
-			} catch (StorageException e) {
-				e.printStackTrace();
-				return false;
-			}
+	    	{	   
+	    		if (region.getId() != "__global__")
+	    		{
+					ResultSet rsgs = statement.executeQuery("SELECT value, playerid, buyable, forsale FROM gp_mc_estate WHERE `name` = '"+region.getId()+"'");
+		    	    if (rsgs.next() && GP2PPLugin.economy.getBalance(offPlayer) >= rsgs.getDouble("value")) 
+		    	    {
+			    	    if(rsgs.getInt("playerid") != playerid)
+			    	    {
+				    	    if(rsgs.getInt("buyable") == 1 || rsgs.getInt("forsale") == 1)
+				    	    {
+				    	    	DefaultDomain members = region.getMembers();
+				    	    	members.addPlayer(player.getUniqueId());
+				    	    	player.sendMessage(region.getId() + " erfolgreich gekauft.");
+				    	    	
+				    			s.setLine(2, playername);
+				    			s.update();
 
-			int en = statement.executeUpdate("UPDATE gp_mc_estate SET `playerid` = '"+ playerid +"' WHERE `name` = '"+region.getId()+"'");
-			
-			if (en > 0) return true; else return false;
-	    	    } else return false;
+				    			//OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
+				    			
+				    		    GP2PPLugin.economy.depositPlayer(offPlayer, rsgs.getDouble("value"));
+				    			GP2PPLugin.economy.withdrawPlayer(offPlayer, rsgs.getDouble("value"));
+				    	    	player.sendMessage(GP2PPLugin.economy.getBalance(offPlayer)+ " " + rsgs.getDouble("value"));
+				    	    	
+				    			int en = statement.executeUpdate("UPDATE gp_mc_estate SET `playerid` = '"+ playerid +"', forsale = 0 WHERE `name` = '"+region.getId()+"'");
+						    	
+				    			try {
+									regions.saveChanges();
+									regions.save();
+								} catch (StorageException e) {
+									e.printStackTrace();
+									return false;
+								}
+							if (en > 0) return true; else return false;
+				    	    } else return false;
+			    	    } else return false;
+		    	    } else return false;
+	    		} else return false;
 			}
 			return false;
 			} else return false;
@@ -100,6 +119,70 @@ public class ActionListener implements Listener {
 			return false;
 		}
 	}
+	
+	private boolean sellEstate(Location location, Player player, Sign s) {
+    	Statement statement;
+		try {
+			statement = GP2PPLugin.connection.createStatement();
+			ResultSet rs = statement.executeQuery("SELECT id, username FROM gp_mc_user WHERE `uuid` = '"+player.getUniqueId()+"'");
+			if (rs.next())
+			{
+			int playerid = rs.getInt("id");		
+			String playername = rs.getString("username");
+			OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
+			World world = player.getWorld();
+			
+	    	WorldGuardPlugin wg = WGBukkit.getPlugin();
+	    	
+	    	RegionContainer container = wg.getRegionContainer();
+	    	RegionManager regions = container.get(world);
+	    	ApplicableRegionSet set = regions.getApplicableRegions(new Location(world, location.getX(), location.getY(), location.getZ() + 1));
+	    	
+	    	for (ProtectedRegion region : set) 
+	    	{	   
+	    		if (region.getId() != "__global__")
+	    		{
+					ResultSet rsgs = statement.executeQuery("SELECT value, playerid, buyable, forsale FROM gp_mc_estate WHERE `name` = '"+region.getId()+"'");
+		    	    if (rsgs.next() && GP2PPLugin.economy.getBalance(offPlayer) >= rsgs.getDouble("value")) 
+		    	    {
+			    	    if(rsgs.getInt("playerid") != playerid)
+			    	    {
+				    	    if(rsgs.getInt("buyable") == 1 || rsgs.getInt("forsale") == 1)
+				    	    {
+				    	    	DefaultDomain members = region.getMembers();
+				    	    	members.addPlayer(player.getUniqueId());
+				    	    	player.sendMessage(region.getId() + " erfolgreich verkauft.");
+				    	    	
+				    			s.setLine(2, null);
+				    			s.update();
+				    			
+				    			//GP2PPLugin.economy.depositPlayer(offPlayer, rsgs.getDouble("value"));
+				    			GP2PPLugin.economy.withdrawPlayer(offPlayer, rsgs.getDouble("value"));
+				    	    	player.sendMessage(GP2PPLugin.economy.getBalance(offPlayer)+ " " + rsgs.getDouble("value"));
+				    	    	
+				    			int en = statement.executeUpdate("UPDATE gp_mc_estate SET `playerid` = '"+ playerid +"' WHERE `name` = '"+region.getId()+"'");
+						    	
+				    			try {
+									regions.saveChanges();
+									regions.save();
+								} catch (StorageException e) {
+									e.printStackTrace();
+									return false;
+								}
+							if (en > 0) return true; else return false;
+				    	    } else return false;
+			    	    } else return false;
+		    	    } else return false;
+	    		} else return false;
+			}
+			return false;
+			} else return false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 
 	private boolean setNewEstate(Block block) {
     	Statement statement;

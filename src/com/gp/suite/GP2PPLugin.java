@@ -5,16 +5,20 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mysql.jdbc.Connection;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
+import net.milkbowl.vault.economy.Economy;
 public class GP2PPLugin extends JavaPlugin {
 	
     final String username= getConfig().getString("Username");
     final String password= getConfig().getString("Password");
     final String url = getConfig().getString("URL");
     static Connection connection;
+    static Economy economy;
     
     @Override
     public void onEnable() {
@@ -32,6 +36,11 @@ public class GP2PPLugin extends JavaPlugin {
             connection = (Connection) DriverManager.getConnection(url,username,password);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
         }
     	
     	this.getCommand("info").setExecutor(new InfoCommand());
